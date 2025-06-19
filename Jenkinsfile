@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        CATALINA_HOME = 'C:\\apache-tomcat-9.0.85'
+        CATALINA_HOME = 'C:\apache-tomcat-10.1.41\webapps'
     }
 
     stages {
