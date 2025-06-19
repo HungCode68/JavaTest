@@ -26,18 +26,19 @@ pipeline {
             }
         }
 
-        stage('Deploy to Tomcat') {
-            steps {
-                echo 'Deploying WAR file to Tomcat'
-                bat '''
-                    if not exist "%TOMCAT_PATH%\\webapps" (
-                        echo "Tomcat webapps folder not found!"
-                        exit /b 1
-                    )
-                    copy UniversitySystem.war "%TOMCAT_PATH%\\webapps\\" /Y
-                '''
-            }
-        }
+     stage('Deploy to Tomcat') {
+    steps {
+        echo 'Deploying WAR file to Tomcat'
+        bat '''
+            if not exist "%TOMCAT_PATH%\\webapps" (
+                echo "Tomcat webapps folder not found!"
+                exit /b 1
+            )
+            copy build\\UniversitySystem.war "%TOMCAT_PATH%\\webapps\\" /Y
+        '''
+    }
+}
+
 
         stage('Restart Tomcat') {
             steps {
