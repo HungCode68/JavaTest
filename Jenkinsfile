@@ -1,8 +1,8 @@
 pipeline {
     agent any
-    
+
     environment {
-        CATALINA_HOME = 'C:\apache-tomcat-10.1.41'
+        TOMCAT_PATH = 'C:\\apache-tomcat-10.1.41'
     }
 
     stages {
@@ -18,7 +18,7 @@ pipeline {
                 echo 'Compiling and packaging WAR file'
                 bat '''
                     mkdir build
-                    javac -d build -cp "%CATALINA_HOME%\\lib\\servlet-api.jar" -sourcepath src src\\**\\*.java
+                    javac -d build -cp "%TOMCAT_PATH%\\lib\\servlet-api.jar" -sourcepath src src\\dao\\*.java src\\model\\*.java src\\servlet\\*.java
                     xcopy Web\\* build /E /I /Y
                     cd build
                     jar -cvf UniversitySystem.war *
@@ -28,9 +28,13 @@ pipeline {
 
         stage('Deploy to Tomcat') {
             steps {
-                echo 'Deploying WAR file to Tomcat (IIS will reverse proxy)'
+                echo 'Deploying WAR file to Tomcat'
                 bat '''
-                    copy build\\UniversitySystem.war "%CATALINA_HOME%\\webapps\\" /Y
+                    if not exist "%TOMCAT_PATH%\\webapps" (
+                        echo "Tomcat webapps folder not found!"
+                        exit /b 1
+                    )
+                    copy UniversitySystem.war "%TOMCAT_PATH%\\webapps\\" /Y
                 '''
             }
         }
@@ -39,9 +43,9 @@ pipeline {
             steps {
                 echo 'Restarting Tomcat server'
                 bat '''
-                    call "%CATALINA_HOME%\\bin\\shutdown.bat"
+                    call "%TOMCAT_PATH%\\bin\\shutdown.bat"
                     timeout /t 5
-                    call "%CATALINA_HOME%\\bin\\startup.bat"
+                    call "%TOMCAT_PATH%\\bin\\startup.bat"
                 '''
             }
         }
